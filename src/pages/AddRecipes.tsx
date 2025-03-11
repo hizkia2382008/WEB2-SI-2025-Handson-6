@@ -1,23 +1,25 @@
 import { useMutation } from "@tanstack/react-query";
-import ProductForm, { ProductFormInput } from "../components/ProductForm";
 import axios from "../utils/AxiosInstance";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import RecipeForm, { Recipe } from "../components/RecipesForm";
 
-const addProduct = async (data: ProductFormInput) => {
-  return await axios.post("/products/add", data);
+const addRecipe = async (data: Recipe) => {
+  return await axios.post("/recipes/add", data);
 };
 
-const AddProduct = () => {
+const AddRecipes = () => {
+
   const { mutate, isSuccess, isPending } = useMutation({
-    mutationFn: addProduct
+    mutationFn: addRecipe
   });
   const navigate = useNavigate();
   useEffect(() => {
     if (isSuccess) {
-      navigate("/product", { replace: true });
+      navigate("/recipes", { replace: true });
     }
   }, [isSuccess]);
+
   return (
     <div className="relative">
       {isPending && (
@@ -47,10 +49,10 @@ const AddProduct = () => {
           </div>
         </div>
       )}
-      <h2 className="text-2xl font-bold mb-6 mt-10">Add Product</h2>
-      <ProductForm isEdit={false} mutateFn={mutate} />
+      <h2 className="text-2xl font-bold mb-6 mt-10">Add Recipe</h2>
+      <RecipeForm isEdit={false} mutateFn={mutate} />
     </div>
-  );
-};
+  )
+}
 
-export default AddProduct;
+export default AddRecipes;

@@ -1,23 +1,52 @@
-import { useMutation } from "@tanstack/react-query";
-import ProductForm, { ProductFormInput } from "../components/ProductForm";
-import axios from "../utils/AxiosInstance";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMutation, useQuery } from '@tanstack/react-query';
+import axios from '../utils/AxiosInstance';
+import { useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom';
+import PostForm from '../components/PostForm';
 
-const addProduct = async (data: ProductFormInput) => {
-  return await axios.post("/products/add", data);
+interface postDat{
+  title : string;
+  body : string;
+  tags : string[];
+  reactions : reactionType;
+  views : number;
+  userId : number;
+}
+
+interface reactionType {
+  likes: number,
+  dislikes: number
+}
+
+
+export const fetchPostDetail = async (id: string | undefined) => {
+  return await axios.get<postDat>(`/post/${id}`);
 };
 
-const AddProduct = () => {
+const editPost = async (data: postDat, id: string | undefined) => {
+  return await axios.put(`/posts/${id}`, data);
+};
+
+const PostEdit = () => {
+  
+  const {id} = useParams();
+
   const { mutate, isSuccess, isPending } = useMutation({
-    mutationFn: addProduct
+    mutationFn: (data : postDat) => editPost(data,id)
   });
+
+  const getPostData = useQuery({
+    queryKey: ["postDatDetail", id],
+    queryFn: () => fetchPostDetail(id)
+  });
+
   const navigate = useNavigate();
   useEffect(() => {
     if (isSuccess) {
-      navigate("/product", { replace: true });
+      navigate("/posts", { replace: true });
     }
   }, [isSuccess]);
+
   return (
     <div className="relative">
       {isPending && (
@@ -47,10 +76,10 @@ const AddProduct = () => {
           </div>
         </div>
       )}
-      <h2 className="text-2xl font-bold mb-6 mt-10">Add Product</h2>
-      <ProductForm isEdit={false} mutateFn={mutate} />
+      <h2 className="text-2xl font-bold mb-6 mt-10">Edit Post</h2>
+      <PostForm isEdit={true} mutateFn={mutate} defaultInputData={getPostData.data?.data}/>
     </div>
-  );
-};
+    );
+}
 
-export default AddProduct;
+export default PostEdit

@@ -1,23 +1,35 @@
-import { useMutation } from "@tanstack/react-query";
-import ProductForm, { ProductFormInput } from "../components/ProductForm";
-import axios from "../utils/AxiosInstance";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMutation } from '@tanstack/react-query';
+import axios from '../utils/AxiosInstance';
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom';
+import CommentFrom from '../components/CommentForm';
 
-const addProduct = async (data: ProductFormInput) => {
-  return await axios.post("/products/add", data);
-};
 
-const AddProduct = () => {
+interface Comment {
+  body : string,
+  postId : number,
+  user : {
+    id : number
+  }
+}
+
+
+const CommentAdd = async (data : Comment) =>{
+  return await axios.post("comments/add", data);
+}
+
+const AddComment = () => {
   const { mutate, isSuccess, isPending } = useMutation({
-    mutationFn: addProduct
+    mutationFn: CommentAdd
   });
   const navigate = useNavigate();
+
   useEffect(() => {
     if (isSuccess) {
-      navigate("/product", { replace: true });
+      navigate("/comments", { replace: true });
     }
   }, [isSuccess]);
+
   return (
     <div className="relative">
       {isPending && (
@@ -47,10 +59,10 @@ const AddProduct = () => {
           </div>
         </div>
       )}
-      <h2 className="text-2xl font-bold mb-6 mt-10">Add Product</h2>
-      <ProductForm isEdit={false} mutateFn={mutate} />
+      <h2 className="text-2xl font-bold mb-6 mt-10">Add Comment</h2>
+      <CommentFrom isEdit={false} mutateFn={mutate} />
     </div>
-  );
-};
+    );
+}
 
-export default AddProduct;
+export default AddComment
